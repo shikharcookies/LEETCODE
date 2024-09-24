@@ -1,39 +1,49 @@
+class Trie {
+    Trie[] arr = new Trie[10];
+}
 class Solution {
+    Trie root = new Trie();
+
     public int longestCommonPrefix(int[] arr1, int[] arr2) {
-        HashMap<Integer, Integer> prefix = new HashMap<>();
-        
-        // Store all prefixes of the first array
-        for (int val : arr1) {
-            int num = val;
-            while (num > 0) {
-                prefix.put(num, prefix.getOrDefault(num, 0) + 1);
-                num /= 10;
-            }
+        for(int ele : arr1) add_number(ele);
+
+        int result = 0;
+        for(int ele : arr2) {
+            result = Math.max(result, find_depth(ele));
         }
+        return result;
+    }
 
-        // Variable to track the maximum length
-        int max = Integer.MIN_VALUE;
-
-        // Instead of creating another map, check the prefix at the moment
-        for (int val : arr2) {
-            int num = val;
-            // Count the number of digits in num
-            int len = (int) Math.log10(num) + 1;
-
-            // Generate all prefixes again
-            while (num > 0) {
-                // If prefix found, break
-                if (prefix.containsKey(num)) {
-                    break;
-                }
-                num /= 10;
-                // Decrease digit count as we decrease prefix
-                len--;
-            }
-
-            max = Math.max(max, len);
+    void add_number(int num) {
+        Trie curr = root;
+        int multi = multi(num);
+        while(multi > 0) {
+            int d = (num / multi) % 10;
+            if(curr.arr[d] == null) curr.arr[d] = new Trie();
+            curr = curr.arr[d];
+            multi /= 10;
         }
+    }
 
-        return max;
+    int find_depth(int num) {
+        Trie curr = root;
+        int depth = 0;
+        int multi = multi(num);
+        while(multi > 0) {
+            int d = (num / multi) % 10;
+            if(curr.arr[d] == null) return depth;
+            curr = curr.arr[d];
+            depth++;
+            multi /= 10;
+        }
+        return depth;
+    }
+
+    int multi(int num) {
+        int multi = 1;
+        while(multi * 10 <= num) {
+            multi *= 10;
+        }
+        return multi;
     }
 }
